@@ -1,0 +1,55 @@
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
+    ports:
+      - "3001:3000"
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27018/fishchill
+      - MQTT_BROKER=mqtt://mosquitto:1884
+      - NODE_ENV=development
+      - JWT_SECRET=${JWT_SECRET:-fishchill-dev-secret-change-me}
+    depends_on:
+      - mongo
+      - mosquitto
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    ports:
+      - "5174:5173"
+    environment:
+      - VITE_PROXY_TARGET=http://backend:3001
+    depends_on:
+      - backend
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1884:1883"
+      - "9002:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
