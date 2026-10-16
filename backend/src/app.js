@@ -10,9 +10,7 @@ const routes = require('./routes');
 const app = express();
 
 app.use(cors({
-  origin: [
-    '*'
-  ],
+  origin: '*',
   credentials: true
 }))
 app.use(express.json({ limit: '2mb' }));
