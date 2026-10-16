@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://fish-chill-vessel-api.vercel.app/api',
   timeout: 15000
 })
 
